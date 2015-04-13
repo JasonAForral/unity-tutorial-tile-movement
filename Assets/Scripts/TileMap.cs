@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,15 +14,17 @@ public class TileMap : MonoBehaviour {
     int[,] tiles;
     Node[,] graph;
 
+    List<Node> currentPath = null;
+    
     public int mapSizeX;
     public int mapSizeY;
 
     void Start()
     {
         GenerateMapData();
+        GeneratePathfindingGraph();
         GenerateMapVisuals();
-        //GeneratePathfindingGraph();
-        
+
     }
 
     void GenerateMapData()
@@ -61,7 +64,7 @@ public class TileMap : MonoBehaviour {
         tiles[8, 6] = 2;
     }
 
-    class Node
+    public class Node
     {
         public List<Node> neighbors;
         public int x;
@@ -72,10 +75,10 @@ public class TileMap : MonoBehaviour {
             neighbors = new List<Node>();
         }
 
+
         public float DistanceTo(Node n)
         {
-            return Vector2.Distance
-                (
+            return Vector2.Distance(
                 new Vector2(x, y),
                 new Vector2(n.x, n.y)
                 );
@@ -83,17 +86,21 @@ public class TileMap : MonoBehaviour {
 
     }
 
+
     void GeneratePathfindingGraph()
     {
-        graph = new Node[mapSizeX, mapSizeY];
-
+        
+        graph = new Node[mapSizeX,mapSizeY];
+        
         for (int x = 0; x < mapSizeX; x++)
         {
-            for (int y = 0; y < mapSizeX; y++)
+            for (int y = 0; y < mapSizeY; y++)
             {
+                graph[x, y] = new Node();
                 graph[x, y].x = x;
                 graph[x, y].y = y;
 
+                
                 //// 4 way connected
                 if (0 < x)
                     graph[x, y].neighbors.Add(graph[x - 1, y]);
@@ -103,6 +110,14 @@ public class TileMap : MonoBehaviour {
                     graph[x, y].neighbors.Add(graph[x, y - 1]);
                 if (mapSizeY - 1 > y)
                     graph[x, y].neighbors.Add(graph[x, y + 1]);
+
+                // 6 way
+                // alternate rows can go diagonal
+                /*
+                 * 
+                 * 
+                 * */
+
             }
         }
     }
@@ -119,28 +134,32 @@ public class TileMap : MonoBehaviour {
                 tch.tileX = x;
                 tch.tileY = y;
                 tch.map = this;
+                //tch.isWalkable = tileTypes[tiles[x, y]].isWalkable;
+                
             }
         }
     }
 
     public Vector3 TileToWorldCoord(int x, int y)
     {
-        return new Vector3(x, 2, y);
+        return new Vector3(x, 1, y);
     }
 
-    public void MoveSelectedUnitTo(int x, int y)
+    public void GeneratePathTo(int x, int y, Node target)
     {
-        
+        /*
         selectedUnit.GetComponent<Unit>().tileX = x;
         selectedUnit.GetComponent<Unit>().tileY = y;
         selectedUnit.transform.position = TileToWorldCoord(x, y);
         selectedUnit.transform.rotation = Quaternion.identity;
-        
-        /*
+        */
+
+        currentPath = null;
+
         Dictionary<Node, float> dist = new Dictionary<Node, float>();
         Dictionary<Node, Node> prev = new Dictionary<Node, Node>();
-
-        // setup the queue - unchecked nodes
+        
+        // setup the queue - the nodes unchecked
         List<Node> unvisited = new List<Node>();
 
         Node source = graph[
@@ -149,6 +168,11 @@ public class TileMap : MonoBehaviour {
             ];
         dist[source] = 0;
         prev[source] = null;
+
+        // Initialize everything to have INFINITY distance,
+        // since we don't know any better right now.
+        // also it's possible that some nodes CAN'T be reached form the source,
+        // which would make INFINITY a reasonable value
 
         foreach (Node v in graph)
         {
@@ -160,11 +184,24 @@ public class TileMap : MonoBehaviour {
             unvisited.Add(v);
         }
 
-        while(unvisited.Count > 0)
+        while(0 < unvisited.Count)
         {
-            // not fast but short
-            // consitter priority of other self sorting optimized
-            Node u = unvisited.OrderBy(n => dist[n]).First();
+            // "u" is unvisited node with smallest distance
+            Node u = null;
+
+            foreach (Node possibleU in unvisited)
+            {
+                if (null == u || dist[possibleU] < dist[u])
+                {
+                    u = possibleU;
+                }
+            }
+
+            if (u == target)
+            {
+                break; //exit the while loop
+            }
+
             unvisited.Remove(u);
             foreach (Node v in u.neighbors)
             {
@@ -175,10 +212,28 @@ public class TileMap : MonoBehaviour {
                     prev[v] = u;
                 }
             }
-
         }
 
-        */
-    }
+        // if we get here, either we found the shortest route or there is no route at all
 
+        if (null == dist[target])
+        {
+            // no route between target and source
+            return;
+        }
+
+        currentPath = new List<Node>();
+        Node curr = target;
+        while (null != curr)
+        {
+            currentPath.Add(curr);
+            curr = prev[curr];
+        }
+
+        // right now, current path describes a rout from our target to our source
+        // so we need to invert it
+
+        currentPath.Reverse();
+
+    }
 }

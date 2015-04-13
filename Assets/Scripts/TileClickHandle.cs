@@ -5,13 +5,15 @@ public class TileClickHandle : MonoBehaviour {
 
     public int tileX;
     public int tileY;
+    //public bool isWalkable;
 
     public TileMap map;
 
-    void OnMouseUp()
+    void OnMouseDown()
     {
-        Debug.Log("Click");
-        map.MoveSelectedUnitTo(tileX, tileY);
+        //Debug.Log("Click");
+        //if (isWalkable)
+            //map.MoveSelectedUnitTo(tileX, tileY);
     }
     
 }
