@@ -255,7 +255,6 @@ public class TileMap : MonoBehaviour {
         if (null == prev[target])
         {
             // no route between target and source
-            Debug.Log("No Path Found");
             return;
         }
 

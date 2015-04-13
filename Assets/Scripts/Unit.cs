@@ -37,7 +37,10 @@ public class Unit : MonoBehaviour {
             remainingMovement -= map.CostToEnterTile(currentPath[1].x, currentPath[1].y);
 
             // now grab the new first node and move us to that position
-            transform.position = map.TileToWorldCoord(currentPath[0].x, currentPath[0].y);
+            tileX = currentPath[1].x;
+            tileY = currentPath[1].y;
+            transform.position = map.TileToWorldCoord(tileX, tileY); // update world position
+
 
             // remove the old current/first node fromt he path.
             currentPath.RemoveAt(0);
