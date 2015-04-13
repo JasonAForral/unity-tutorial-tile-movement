@@ -9,7 +9,7 @@ public class Unit : MonoBehaviour {
 
     public TileMap map;
 
-    public List<TileMap.Node> currentPath = null;
+    public List<Node> currentPath = null;
 
     void Update ()
     {
@@ -19,7 +19,7 @@ public class Unit : MonoBehaviour {
             {
                 Vector3 startPoint = map.TileToWorldCoord(currentPath[currNode    ].x, currentPath[currNode    ].y);
                 Vector3 endPoint   = map.TileToWorldCoord(currentPath[currNode + 1].x, currentPath[currNode + 1].y);
-                Debug.DrawLine(startPoint, endPoint, Color.cyan);
+                Debug.DrawLine(startPoint, endPoint, Color.red);
             }
         }
     }

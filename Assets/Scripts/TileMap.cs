@@ -68,26 +68,7 @@ public class TileMap : MonoBehaviour {
         tiles[8, 6] = 2;
     }
 
-    public class Node
-    {
-        public List<Node> neighbors;
-        public int x;
-        public int y;
-
-        public Node()
-        {
-            neighbors = new List<Node>();
-        }
-
-
-        public float DistanceTo(Node n)
-        {
-            return Vector2.Distance(
-                new Vector2(x, y),
-                new Vector2(n.x, n.y)
-                );
-        }
-    }
+    
 
     void GeneratePathfindingGraph()
     {
@@ -191,8 +172,6 @@ public class TileMap : MonoBehaviour {
             unvisited.Add(v);
         }
 
-        int counter = 0;
-
         while(0 < unvisited.Count)
         {
             // "u" is unvisited node with smallest distance
@@ -237,7 +216,8 @@ public class TileMap : MonoBehaviour {
 
         Debug.Log("Path Found");
         currentPath = new List<Node>();
-        currentPath.Capacity = 20;
+        // Capacity limits to prevent out of memory
+        //currentPath.Capacity = 20;
         Node curr = target;
         while (null != curr)
         {
