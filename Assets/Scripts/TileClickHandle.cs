@@ -13,7 +13,6 @@ public class TileClickHandle : MonoBehaviour {
     {
         //Debug.Log("Click");
         //if (isWalkable)
-            //map.MoveSelectedUnitTo(tileX, tileY);
     }
     
 }
