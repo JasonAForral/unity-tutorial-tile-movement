@@ -14,9 +14,6 @@ public class TileMap : MonoBehaviour {
     int[,] tiles;
     Node[,] graph;
 
-    // assuming only one unit
-    List<Node> currentPath = null;
-    
     public int mapSizeX;
     public int mapSizeY;
 
@@ -165,14 +162,17 @@ public class TileMap : MonoBehaviour {
 
     public void GeneratePathTo(int x, int y)
     {
+        // clear old path
+        selectedUnit.GetComponent<Unit>().currentPath = null;
+        List < Node > currentPath = null;
+        
         /*
-        selectedUnit.GetComponent<Unit>().tileX = x;
-        selectedUnit.GetComponent<Unit>().tileY = y;
-        selectedUnit.transform.position = TileToWorldCoord(x, y);
-        selectedUnit.transform.rotation = Quaternion.identity;
-        */
+            selectedUnit.GetComponent<Unit>().tileX = x;
+            selectedUnit.GetComponent<Unit>().tileY = y;
+            selectedUnit.transform.position = TileToWorldCoord(x, y);
+            selectedUnit.transform.rotation = Quaternion.identity;
+            */
 
-        currentPath = null;
         Node target = graph[x, y].CopyNode();
         
         Dictionary<Node, float> dist = new Dictionary<Node, float>();
@@ -253,6 +253,8 @@ public class TileMap : MonoBehaviour {
         // so we need to invert it
 
         currentPath.Reverse();
+
+        selectedUnit.GetComponent<Unit>().currentPath = currentPath;
 
     }
 }
