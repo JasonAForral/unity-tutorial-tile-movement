@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 public class TileClickHandle : MonoBehaviour {
 
@@ -11,6 +12,9 @@ public class TileClickHandle : MonoBehaviour {
 
     void OnMouseDown()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
         //if (isWalkable)
         map.GeneratePathTo(tileX, tileY);
     }
