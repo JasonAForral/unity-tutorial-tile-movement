@@ -71,6 +71,10 @@ public class TileMap : MonoBehaviour {
     public float CostToEnterTile(int x, int y)
     {
         TileType tt = tileTypes[tiles[x, y]];
+
+        if (!tt.isWalkable)
+            return Mathf.Infinity;
+
         return tt.movementCost;
     }
 
@@ -258,7 +262,6 @@ public class TileMap : MonoBehaviour {
             return;
         }
 
-        Debug.Log("Path Found");
         currentPath = new List<Node>();
         // Capacity limits to prevent out of memory
         //currentPath.Capacity = 20;
