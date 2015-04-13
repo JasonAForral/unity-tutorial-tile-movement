@@ -13,6 +13,7 @@ public class TileClickHandle : MonoBehaviour {
     {
         //Debug.Log("Click");
         //if (isWalkable)
+        map.GeneratePathTo(tileX, tileY);
     }
     
 }

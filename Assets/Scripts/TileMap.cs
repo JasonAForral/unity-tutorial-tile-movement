@@ -14,6 +14,7 @@ public class TileMap : MonoBehaviour {
     int[,] tiles;
     Node[,] graph;
 
+    // assuming only one unit
     List<Node> currentPath = null;
     
     public int mapSizeX;
@@ -84,14 +85,24 @@ public class TileMap : MonoBehaviour {
                 );
         }
 
+        public Node CopyNode()
+        {
+            Node ode = new Node();
+            ode.x = x;
+            ode.y = y;
+            ode.neighbors = neighbors;
+            return ode;
+        }
+
     }
 
 
     void GeneratePathfindingGraph()
     {
-        
+        // Initialize the array
         graph = new Node[mapSizeX,mapSizeY];
-        
+
+        // initialize each node
         for (int x = 0; x < mapSizeX; x++)
         {
             for (int y = 0; y < mapSizeY; y++)
@@ -100,7 +111,14 @@ public class TileMap : MonoBehaviour {
                 graph[x, y].x = x;
                 graph[x, y].y = y;
 
-                
+            }
+        }
+        
+        // calculate neighbors
+        for (int x = 0; x < mapSizeX; x++)
+        {
+            for (int y = 0; y < mapSizeY; y++)
+            {
                 //// 4 way connected
                 if (0 < x)
                     graph[x, y].neighbors.Add(graph[x - 1, y]);
@@ -145,7 +163,7 @@ public class TileMap : MonoBehaviour {
         return new Vector3(x, 1, y);
     }
 
-    public void GeneratePathTo(int x, int y, Node target)
+    public void GeneratePathTo(int x, int y)
     {
         /*
         selectedUnit.GetComponent<Unit>().tileX = x;
@@ -155,7 +173,8 @@ public class TileMap : MonoBehaviour {
         */
 
         currentPath = null;
-
+        Node target = graph[x, y].CopyNode();
+        
         Dictionary<Node, float> dist = new Dictionary<Node, float>();
         Dictionary<Node, Node> prev = new Dictionary<Node, Node>();
         
