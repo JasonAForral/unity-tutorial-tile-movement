@@ -46,7 +46,7 @@ public class TileMap : MonoBehaviour {
         }
 
         // Add Swamp area
-        for (int x = 3; x < 5; x++)
+        for (int x = 3; x < 6; x++)
         {
             for (int y = 0; y < 4; y++)
             {
@@ -68,7 +68,7 @@ public class TileMap : MonoBehaviour {
         tiles[8, 6] = 2;
     }
 
-    float CostToEnterTile(int x, int y)
+    public float CostToEnterTile(int x, int y)
     {
         TileType tt = tileTypes[tiles[x, y]];
         return tt.movementCost;
@@ -97,6 +97,7 @@ public class TileMap : MonoBehaviour {
             for (int y = 0; y < mapSizeY; y++)
             {
                 //// 4 way connected
+                /*
                 if (0 < x)
                     graph[x, y].neighbors.Add(graph[x - 1, y]);
                 if (mapSizeX - 1 > x)
@@ -105,13 +106,50 @@ public class TileMap : MonoBehaviour {
                     graph[x, y].neighbors.Add(graph[x, y - 1]);
                 if (mapSizeY - 1 > y)
                     graph[x, y].neighbors.Add(graph[x, y + 1]);
-
+                */
                 // 6 way
                 // alternate rows can go diagonal
                 /*
                  * 
                  * 
                  * */
+
+                // 8 way with diagonals
+
+                if (0 < x)
+                {
+                    //allow left
+                    graph[x, y].neighbors.Add(graph[x - 1, y]);
+                    if (0 < y) //allow down-left
+                    {
+                        graph[x, y].neighbors.Add(graph[x - 1, y - 1]);
+                    }
+                    if (mapSizeY - 1 > y) //allow up-left
+                    {
+                        graph[x, y].neighbors.Add(graph[x - 1, y + 1]);
+                    }
+                }
+                if (mapSizeX - 1 > x) //allow right
+                {
+                    graph[x, y].neighbors.Add(graph[x + 1, y]);
+                    if (0 < y) //allow down-right
+                    {
+                        graph[x, y].neighbors.Add(graph[x + 1, y - 1]);
+                    }
+                    if (mapSizeY - 1 > y) //allow up-right
+                    {
+                        graph[x, y].neighbors.Add(graph[x + 1, y + 1]);
+                    }
+                }
+                if (0 < y) //allow down
+                {
+                    graph[x, y].neighbors.Add(graph[x, y - 1]);
+                }
+                if (mapSizeY - 1 > y) //allow up
+                {
+                    graph[x, y].neighbors.Add(graph[x, y + 1]);
+                }
+
 
             }
         }
@@ -202,7 +240,8 @@ public class TileMap : MonoBehaviour {
             {
                 //float alt = dist[u] + u.DistanceTo(v);
                 // instead let's use weights
-                float alt = dist[u] + CostToEnterTile(v.x, v.y);
+                //float alt = dist[u] + CostToEnterTile(v.x, v.y);
+                float alt = dist[u] + CostToEnterTile(v.x, v.y) * u.DistanceTo(v);
                 if (alt < dist[v])
                 {
                     dist[v] = alt;
