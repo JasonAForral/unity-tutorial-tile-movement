@@ -11,7 +11,7 @@ public class TileClickHandle : MonoBehaviour {
 
     void OnMouseDown()
     {
-        //Debug.Log("Click");
+        Debug.Log("Click");
         //if (isWalkable)
         map.GeneratePathTo(tileX, tileY);
     }

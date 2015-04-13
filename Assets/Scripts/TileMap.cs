@@ -19,6 +19,12 @@ public class TileMap : MonoBehaviour {
 
     void Start()
     {
+        // Setup the selectedUnit's Variables
+
+        selectedUnit.GetComponent<Unit>().tileX = (int)selectedUnit.transform.position.x;
+        selectedUnit.GetComponent<Unit>().tileY = (int)selectedUnit.transform.position.z;
+        selectedUnit.GetComponent<Unit>().map = this;
+
         GenerateMapData();
         GeneratePathfindingGraph();
         GenerateMapVisuals();
@@ -81,18 +87,7 @@ public class TileMap : MonoBehaviour {
                 new Vector2(n.x, n.y)
                 );
         }
-
-        public Node CopyNode()
-        {
-            Node ode = new Node();
-            ode.x = x;
-            ode.y = y;
-            ode.neighbors = neighbors;
-            return ode;
-        }
-
     }
-
 
     void GeneratePathfindingGraph()
     {
@@ -166,18 +161,9 @@ public class TileMap : MonoBehaviour {
         selectedUnit.GetComponent<Unit>().currentPath = null;
         List < Node > currentPath = null;
         
-        /*
-            selectedUnit.GetComponent<Unit>().tileX = x;
-            selectedUnit.GetComponent<Unit>().tileY = y;
-            selectedUnit.transform.position = TileToWorldCoord(x, y);
-            selectedUnit.transform.rotation = Quaternion.identity;
-            */
-
-        Node target = graph[x, y].CopyNode();
-        
         Dictionary<Node, float> dist = new Dictionary<Node, float>();
-        Dictionary<Node, Node> prev = new Dictionary<Node, Node>();
-        
+        Dictionary<Node, Node>  prev = new Dictionary<Node, Node>();
+
         // setup the queue - the nodes unchecked
         List<Node> unvisited = new List<Node>();
 
@@ -185,6 +171,7 @@ public class TileMap : MonoBehaviour {
             selectedUnit.GetComponent<Unit>().tileX,
             selectedUnit.GetComponent<Unit>().tileY
             ];
+        Node target = graph[x, y];
         dist[source] = 0;
         prev[source] = null;
 
@@ -193,6 +180,7 @@ public class TileMap : MonoBehaviour {
         // also it's possible that some nodes CAN'T be reached form the source,
         // which would make INFINITY a reasonable value
 
+        
         foreach (Node v in graph)
         {
             if (v != source)
@@ -202,6 +190,8 @@ public class TileMap : MonoBehaviour {
             }
             unvisited.Add(v);
         }
+
+        int counter = 0;
 
         while(0 < unvisited.Count)
         {
@@ -216,12 +206,15 @@ public class TileMap : MonoBehaviour {
                 }
             }
 
+            
             if (u == target)
             {
+                
                 break; //exit the while loop
             }
 
             unvisited.Remove(u);
+            
             foreach (Node v in u.neighbors)
             {
                 float alt = dist[u] + u.DistanceTo(v);
@@ -235,13 +228,16 @@ public class TileMap : MonoBehaviour {
 
         // if we get here, either we found the shortest route or there is no route at all
 
-        if (null == dist[target])
+        if (null == prev[target])
         {
             // no route between target and source
+            Debug.Log("No Path Found");
             return;
         }
 
+        Debug.Log("Path Found");
         currentPath = new List<Node>();
+        currentPath.Capacity = 20;
         Node curr = target;
         while (null != curr)
         {
